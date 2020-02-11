@@ -3,3 +3,6 @@
 /plots
 /runs
 /saves
+## added by tom
+/env
+__pycache__
