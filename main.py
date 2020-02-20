@@ -18,6 +18,7 @@ import torchvision.utils as vutils
 import seaborn as sns
 import torch.nn.init as init
 import pickle
+import random
 
 # Custom Libraries
 import utils
@@ -30,6 +31,7 @@ sns.set_style('darkgrid')
 
 # Main
 def main(args, ITE=0):
+    set_random_seed(args.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     reinit = True if args.prune_type=="reinit" else False
 
@@ -163,8 +165,8 @@ def main(args, ITE=0):
                 # Save Weights
                 if accuracy > best_accuracy:
                     best_accuracy = accuracy
-                    utils.checkdir(f"{os.getcwd()}/saves/{args.arch_type}/{args.dataset}/")
-                    torch.save(model,f"{os.getcwd()}/saves/{args.arch_type}/{args.dataset}/{_ite}_model_{args.prune_type}.pth.tar")
+                    utils.checkdir(f"{os.getcwd()}/saves/{args.arch_type}/{args.dataset}/{args.seed}/")
+                    torch.save(model,f"{os.getcwd()}/saves/{args.arch_type}/{args.dataset}/{args.seed}/{_ite}_model_{args.prune_type}.pth.tar")
 
             # Training
             loss = train(model, train_loader, optimizer, criterion)
@@ -189,18 +191,18 @@ def main(args, ITE=0):
         plt.ylabel("Loss and Accuracy")
         plt.legend()
         plt.grid(color="gray")
-        utils.checkdir(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/")
-        plt.savefig(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.prune_type}_LossVsAccuracy_{comp1}.png", dpi=1200)
+        utils.checkdir(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/")
+        plt.savefig(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_LossVsAccuracy_{comp1}.png", dpi=1200)
         plt.close()
 
         # Dump Plot values
-        utils.checkdir(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/")
-        all_loss.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.prune_type}_all_loss_{comp1}.dat")
-        all_accuracy.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.prune_type}_all_accuracy_{comp1}.dat")
+        utils.checkdir(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/")
+        all_loss.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_all_loss_{comp1}.dat")
+        all_accuracy.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_all_accuracy_{comp1}.dat")
 
         # Dumping mask
-        utils.checkdir(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/")
-        with open(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.prune_type}_mask_{comp1}.pkl", 'wb') as fp:
+        utils.checkdir(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/")
+        with open(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_mask_{comp1}.pkl", 'wb') as fp:
             pickle.dump(mask, fp)
 
         # Making variables into 0
@@ -209,9 +211,9 @@ def main(args, ITE=0):
         all_accuracy = np.zeros(args.end_iter,float)
 
     # Dumping Values for Plotting
-    utils.checkdir(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/")
-    comp.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.prune_type}_compression.dat")
-    bestacc.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.prune_type}_bestaccuracy.dat")
+    utils.checkdir(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/")
+    comp.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_compression.dat")
+    bestacc.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_bestaccuracy.dat")
 
     # Plotting
     a = np.arange(args.prune_iterations)
@@ -223,8 +225,8 @@ def main(args, ITE=0):
     plt.ylim(0,100)
     plt.legend()
     plt.grid(color="gray")
-    utils.checkdir(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/")
-    plt.savefig(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.prune_type}_AccuracyVsWeights.png", dpi=1200)
+    utils.checkdir(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/")
+    plt.savefig(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_AccuracyVsWeights.png", dpi=1200)
     plt.close()
 
 # Function for Training
@@ -391,6 +393,16 @@ def weight_init(m):
             else:
                 init.normal_(param.data)
 
+def set_random_seed(seed):
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.manual_seed(seed)
+    # if you are using GPU
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
 
 if __name__=="__main__":
 
@@ -412,6 +424,7 @@ if __name__=="__main__":
     parser.add_argument("--arch_type", default="fc1", type=str, help="fc1 | lenet5 | lenet5_nmp | alexnet | vgg16 | resnet18 | densenet121")
     parser.add_argument("--prune_percent", default=10, type=int, help="Pruning percent")
     parser.add_argument("--prune_iterations", default=35, type=int, help="Pruning iterations count")
+    parser.add_argument("--seed", default=1337, type=int, help="Random Seed")
 
 
     args = parser.parse_args()
