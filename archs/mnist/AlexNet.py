@@ -29,10 +29,10 @@ class AlexNet(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
         )
-        self.avgpool = nn.AdaptiveAvgPool2d((6, 6))
+        # self.avgpool = nn.AdaptiveAvgPool2d((6, 6))
         self.classifier = nn.Sequential(
             nn.Dropout(),
-            nn.Linear(256 * 6 * 6, 4096),
+            nn.Linear(256, 4096),
             nn.ReLU(inplace=True),
             nn.Dropout(),
             nn.Linear(4096, 4096),
@@ -40,9 +40,22 @@ class AlexNet(nn.Module):
             nn.Linear(4096, num_classes),
         )
 
+
+        self.param_info = [{'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':2, 'padding': 2, 'name':'Conv1'},
+                            {'layer_type':'MaxPool2d', 'kernel_size':(3,3), 'stride':2, 'padding':0, 'name':'MaxPool1'},
+                            {'layer_type': 'Conv2d', 'kernel_size':(5,5), 'stride':1, 'padding':2, 'name':'Conv2'},
+                            {'layer_type':'MaxPool2d', 'kernel_size':(3,3), 'stride':2, 'padding':0, 'name':'MaxPool2'},
+                            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Conv3'},
+                            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Conv4'},
+                            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Conv5'},
+                            {'layer_type':'MaxPool2d', 'kernel_size':(3,3), 'stride':2, 'padding':0, 'name':'MaxPool3'},
+                            {'layer_type':'Linear', 'name': 'Linear1'},
+                            {'layer_type':'Linear', 'name': 'Linear2'},
+                            {'layer_type':'Linear', 'name': 'Linear3'},]
+
     def forward(self, x):
         x = self.features(x)
-        x = self.avgpool(x)
+        # x = self.avgpool(x)
         x = torch.flatten(x, 1)
         x = self.classifier(x)
         return x

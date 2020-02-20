@@ -19,6 +19,13 @@ class LeNet5(nn.Module):
             nn.Linear(256, num_classes),
         )
 
+        self.param_info = [{'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding': 1, 'name':'Conv1'},
+                            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Conv2'},
+                            {'layer_type':'MaxPool2d', 'kernel_size':(2,2), 'stride':2, 'padding':0, 'name':'MaxPool1'},
+                            {'layer_type':'Linear', 'name': 'Linear1'},
+                            {'layer_type':'Linear', 'name': 'Linear2'}]
+
+
     def forward(self, x):
         x = self.features(x)
         x = torch.flatten(x, 1)
