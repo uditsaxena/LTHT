@@ -128,9 +128,9 @@ def main(args, ITE=0):
     for _ite in range(args.start_iter, ITERATION):
         if not _ite == 0:
             if (args.prune_scale == "layer"):
-                prune_by_percentile(args.prune_percent, resample=resample, reinit=reinit)
+                prune_by_percentile(args, args.prune_percent, resample=resample, reinit=reinit)
             elif (args.prune_scale == "global"):
-                prune_by_percentile_global(args.prune_percent, resample=resample, reinit=reinit)
+                prune_by_percentile_global(args, args.prune_percent, resample=resample, reinit=reinit)
             if reinit:
                 model.apply(weight_init)
                 #if args.arch_type == "fc1":
@@ -284,7 +284,7 @@ def test(model, test_loader, criterion):
     return accuracy
 
 # Prune by Percentile module
-def prune_by_percentile(percent, resample=False, reinit=False,**kwargs):
+def prune_by_percentile(args, percent, resample=False, reinit=False,**kwargs):
         global step
         global mask
         global model
@@ -294,7 +294,7 @@ def prune_by_percentile(percent, resample=False, reinit=False,**kwargs):
         for name, param in model.named_parameters():
 
             # We do not prune bias term
-            if 'weight' in name:
+            if 'weight' in name and ((args.prune_only_conv == 1 and 'conv' in name) or (args.prune_only_conv == 0)):
                 tensor = param.data.cpu().numpy()
                 alive = tensor[np.nonzero(tensor)] # flattened array of nonzero values
                 percentile_value = np.percentile(abs(alive), percent)
@@ -310,7 +310,7 @@ def prune_by_percentile(percent, resample=False, reinit=False,**kwargs):
         step = 0
 
 
-def prune_by_percentile_global(percent, resample=False, reinit=False, **kwargs):
+def prune_by_percentile_global(args, percent, resample=False, reinit=False, **kwargs):
     global step
     global mask
     global model
@@ -319,7 +319,7 @@ def prune_by_percentile_global(percent, resample=False, reinit=False, **kwargs):
     alive = np.array([])
     for name, param in model.named_parameters():
         # We do not prune bias term
-        if 'weight' in name:
+        if 'weight' in name and ((args.prune_only_conv == 1 and 'conv' in name) or (args.prune_only_conv == 0)):
             tensor = param.data.cpu().numpy()
             alive = np.append(alive, tensor[np.nonzero(tensor)])  # flattened array of nonzero values
     percentile_value = np.percentile(abs(alive), percent)
@@ -328,7 +328,7 @@ def prune_by_percentile_global(percent, resample=False, reinit=False, **kwargs):
     for name, param in model.named_parameters():
 
         # We do not prune bias term
-        if 'weight' in name:
+        if 'weight' in name and ((args.prune_only_conv == 1 and 'conv' in name) or (args.prune_only_conv == 0)):
             tensor = param.data.cpu().numpy()
             # alive = tensor[np.nonzero(tensor)]  # flattened array of nonzero values
             # percentile_value = np.percentile(abs(alive), percent)
@@ -477,6 +477,7 @@ if __name__=="__main__":
     parser.add_argument("--seed", default=1337, type=int, help="Random Seed")
     parser.add_argument("--optimizer", default="adam", type=str, help="adam | sgd | momentum")
     parser.add_argument("--prune_scale", default="layer", type=str, help="Pruning scale: per layer or global. Default - 'layer' from: layer | global")
+    parser.add_argument("--prune_only_conv", default=0, type=int, help="Prune only conv layer Default - 0 (false) from: 0 (false) | 1 (true)")
 
 
     args = parser.parse_args()
