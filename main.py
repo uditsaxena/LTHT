@@ -100,7 +100,13 @@ def main(args, ITE=0):
     make_mask(model)
 
     # Optimizer and Loss
-    optimizer = torch.optim.Adam(model.parameters(), weight_decay=1e-4)
+    if (args.optimizer == "adam"):
+        optimizer = torch.optim.Adam(model.parameters(), weight_decay=1e-4)
+    elif (args.optimizer == "sgd"):
+        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=1e-4)
+    elif (args.optimizer == "momentum"):
+        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=1e-4, momentum=args.momentum)
+
     criterion = nn.CrossEntropyLoss() # Default was F.nll_loss
 
     # Layer Looper
@@ -121,7 +127,10 @@ def main(args, ITE=0):
 
     for _ite in range(args.start_iter, ITERATION):
         if not _ite == 0:
-            prune_by_percentile(args.prune_percent, resample=resample, reinit=reinit)
+            if (args.prune_type == "layer"):
+                prune_by_percentile(args.prune_percent, resample=resample, reinit=reinit)
+            elif (args.prune_type == "global"):
+                prune_by_percentile_global(args.prune_percent, resample=resample, reinit=reinit)
             if reinit:
                 model.apply(weight_init)
                 #if args.arch_type == "fc1":
@@ -148,7 +157,12 @@ def main(args, ITE=0):
                 step = 0
             else:
                 original_initialization(mask, initial_state_dict)
-            optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-4)
+            if (args.optimizer == "adam"):
+                optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-4)
+            elif (args.optimizer == "sgd"):
+                optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=1e-4)
+            elif (args.optimizer == "momentum"):
+                optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=1e-4, momentum=args.momentum)
         print(f"\n--- Pruning Level [{ITE}:{_ite}/{ITERATION}]: ---")
 
         # Print the table of Nonzeros in each layer
@@ -166,7 +180,7 @@ def main(args, ITE=0):
                 if accuracy > best_accuracy:
                     best_accuracy = accuracy
                     utils.checkdir(f"{os.getcwd()}/saves/{args.arch_type}/{args.dataset}/{args.seed}/")
-                    torch.save(model,f"{os.getcwd()}/saves/{args.arch_type}/{args.dataset}/{args.seed}/{_ite}_model_{args.prune_type}.pth.tar")
+                    torch.save(model,f"{os.getcwd()}/saves/{args.arch_type}/{args.dataset}/{args.seed}/{_ite}_model_{args.prune_type}_{args.prune_percentage}_{iter_}.pth.tar")
 
             # Training
             loss = train(model, train_loader, optimizer, criterion)
@@ -192,17 +206,17 @@ def main(args, ITE=0):
         plt.legend()
         plt.grid(color="gray")
         utils.checkdir(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/")
-        plt.savefig(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_LossVsAccuracy_{comp1}.png", dpi=1200)
+        plt.savefig(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_LossVsAccuracy_{comp1}_{args.prune_percentage}.png", dpi=1200)
         plt.close()
 
         # Dump Plot values
         utils.checkdir(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/")
-        all_loss.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_all_loss_{comp1}.dat")
-        all_accuracy.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_all_accuracy_{comp1}.dat")
+        all_loss.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_all_loss_{comp1}_{args.prune_percentage}.dat")
+        all_accuracy.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_all_accuracy_{comp1}_{args.prune_percentage}.dat")
 
         # Dumping mask
         utils.checkdir(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/")
-        with open(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_mask_{comp1}.pkl", 'wb') as fp:
+        with open(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_mask_{comp1}_{args.prune_percentage}.pkl", 'wb') as fp:
             pickle.dump(mask, fp)
 
         # Making variables into 0
@@ -212,8 +226,8 @@ def main(args, ITE=0):
 
     # Dumping Values for Plotting
     utils.checkdir(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/")
-    comp.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_compression.dat")
-    bestacc.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_bestaccuracy.dat")
+    comp.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_{args.prune_percentage}_compression.dat")
+    bestacc.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_{args.prune_percentage}_bestaccuracy.dat")
 
     # Plotting
     a = np.arange(args.prune_iterations)
@@ -226,7 +240,7 @@ def main(args, ITE=0):
     plt.legend()
     plt.grid(color="gray")
     utils.checkdir(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/")
-    plt.savefig(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_AccuracyVsWeights.png", dpi=1200)
+    plt.savefig(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_{args.prune_percentage}_AccuracyVsWeights.png", dpi=1200)
     plt.close()
 
 # Function for Training
@@ -294,6 +308,41 @@ def prune_by_percentile(percent, resample=False, reinit=False,**kwargs):
                 mask[step] = new_mask
                 step += 1
         step = 0
+
+
+def prune_by_percentile_global(percent, resample=False, reinit=False, **kwargs):
+    global step
+    global mask
+    global model
+
+    # Calculate global percentile value
+    alive = np.array([])
+    for name, param in model.named_parameters():
+        # We do not prune bias term
+        if 'weight' in name:
+            tensor = param.data.cpu().numpy()
+            alive = alive.append(tensor[np.nonzero(tensor)])  # flattened array of nonzero values
+    percentile_value = np.percentile(abs(alive), percent)
+
+    step = 0
+    for name, param in model.named_parameters():
+
+        # We do not prune bias term
+        if 'weight' in name:
+            tensor = param.data.cpu().numpy()
+            # alive = tensor[np.nonzero(tensor)]  # flattened array of nonzero values
+            # percentile_value = np.percentile(abs(alive), percent)
+
+            # Convert Tensors to numpy and calculate
+            weight_dev = param.device
+            new_mask = np.where(abs(tensor) < percentile_value, 0, mask[step])
+
+            # Apply new weight and mask
+            param.data = torch.from_numpy(tensor * new_mask).to(weight_dev)
+            mask[step] = new_mask
+            step += 1
+    step = 0
+
 
 # Function to make an empty mask of the same size as the model
 def make_mask(model):
@@ -411,7 +460,8 @@ if __name__=="__main__":
 
     # Arguement Parser
     parser = argparse.ArgumentParser()
-    parser.add_argument("--lr",default= 1.2e-3, type=float, help="Learning rate")
+    parser.add_argument("--lr",default= 1.2e-3, type=float, help="Learning rate, default - 1.2e-3")
+    parser.add_argument("--momentum",default= 0.9, type=float, help="Momentum, default - 0.9")
     parser.add_argument("--batch_size", default=60, type=int)
     parser.add_argument("--start_iter", default=0, type=int)
     parser.add_argument("--end_iter", default=100, type=int)
@@ -425,6 +475,8 @@ if __name__=="__main__":
     parser.add_argument("--prune_percent", default=10, type=int, help="Pruning percent")
     parser.add_argument("--prune_iterations", default=35, type=int, help="Pruning iterations count")
     parser.add_argument("--seed", default=1337, type=int, help="Random Seed")
+    parser.add_argument("--optimizer", default="adam", type=str, help="adam | sgd | momentum")
+    parser.add_argument("--prune_type", default="layer", type=str, help="Pruning per layer or global. Default - 'layer' from: layer | global")
 
 
     args = parser.parse_args()
