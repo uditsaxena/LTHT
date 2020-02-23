@@ -127,9 +127,9 @@ def main(args, ITE=0):
 
     for _ite in range(args.start_iter, ITERATION):
         if not _ite == 0:
-            if (args.prune_type == "layer"):
+            if (args.prune_scale == "layer"):
                 prune_by_percentile(args.prune_percent, resample=resample, reinit=reinit)
-            elif (args.prune_type == "global"):
+            elif (args.prune_scale == "global"):
                 prune_by_percentile_global(args.prune_percent, resample=resample, reinit=reinit)
             if reinit:
                 model.apply(weight_init)
@@ -476,7 +476,7 @@ if __name__=="__main__":
     parser.add_argument("--prune_iterations", default=35, type=int, help="Pruning iterations count")
     parser.add_argument("--seed", default=1337, type=int, help="Random Seed")
     parser.add_argument("--optimizer", default="adam", type=str, help="adam | sgd | momentum")
-    parser.add_argument("--prune_type", default="layer", type=str, help="Pruning per layer or global. Default - 'layer' from: layer | global")
+    parser.add_argument("--prune_scale", default="layer", type=str, help="Pruning scale: per layer or global. Default - 'layer' from: layer | global")
 
 
     args = parser.parse_args()
