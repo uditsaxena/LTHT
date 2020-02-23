@@ -350,12 +350,12 @@ def make_mask(model):
     global mask
     step = 0
     for name, param in model.named_parameters():
-        if 'weight' in name:
+        if 'weight' in name and ((args.prune_only_conv == 1 and 'conv' in name) or (args.prune_only_conv == 0)):
             step = step + 1
     mask = [None]* step
     step = 0
     for name, param in model.named_parameters():
-        if 'weight' in name:
+        if 'weight' in name and ((args.prune_only_conv == 1 and 'conv' in name) or (args.prune_only_conv == 0)):
             tensor = param.data.cpu().numpy()
             mask[step] = np.ones_like(tensor)
             step = step + 1
@@ -366,11 +366,11 @@ def original_initialization(mask_temp, initial_state_dict):
 
     step = 0
     for name, param in model.named_parameters():
-        if "weight" in name:
+        if "weight" in name and ((args.prune_only_conv == 1 and 'conv' in name) or (args.prune_only_conv == 0)):
             weight_dev = param.device
             param.data = torch.from_numpy(mask_temp[step] * initial_state_dict[name].cpu().numpy()).to(weight_dev)
             step = step + 1
-        if "bias" in name:
+        if "bias" in name and ((args.prune_only_conv == 1 and 'conv' in name) or (args.prune_only_conv == 0)):
             param.data = initial_state_dict[name]
     step = 0
 
