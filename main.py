@@ -321,7 +321,7 @@ def prune_by_percentile_global(percent, resample=False, reinit=False, **kwargs):
         # We do not prune bias term
         if 'weight' in name:
             tensor = param.data.cpu().numpy()
-            alive = alive.append(tensor[np.nonzero(tensor)])  # flattened array of nonzero values
+            alive = np.append(alive, tensor[np.nonzero(tensor)])  # flattened array of nonzero values
     percentile_value = np.percentile(abs(alive), percent)
 
     step = 0
