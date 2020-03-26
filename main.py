@@ -40,12 +40,12 @@ def main(args, ITE=0):
     if args.dataset == "mnist":
         traindataset = datasets.MNIST('../data', train=True, download=True,transform=transform)
         testdataset = datasets.MNIST('../data', train=False, transform=transform)
-        from archs.mnist import AlexNet, LeNet5, fc1, vgg, resnet
+        from archs.mnist import AlexNet, LeNet5, fc1, vgg, resnet, resnet_nmp
 
     elif args.dataset == "cifar10":
         traindataset = datasets.CIFAR10('../data', train=True, download=True,transform=transform)
         testdataset = datasets.CIFAR10('../data', train=False, transform=transform)
-        from archs.cifar10 import AlexNet, LeNet5, fc1, vgg, resnet, densenet
+        from archs.cifar10 import AlexNet, LeNet5, fc1, vgg, resnet, densenet, resnet_nmp
 
     elif args.dataset == "fashionmnist":
         traindataset = datasets.FashionMNIST('../data', train=True, download=True,transform=transform)
@@ -77,10 +77,14 @@ def main(args, ITE=0):
         model = LeNet5.LeNet5_nmp().to(device)
     elif args.arch_type == "alexnet":
         model = AlexNet.AlexNet().to(device)
+    elif args.arch_type == "alexnet_nmp":
+        model = AlexNet.AlexNet_nmp().to(device)
     elif args.arch_type == "vgg16":
         model = vgg.vgg16().to(device)
     elif args.arch_type == "resnet18":
         model = resnet.resnet18().to(device)
+    elif args.arch_type == "resnet18_nmp":
+        model = resnet_nmp.resnet18().to(device)
     elif args.arch_type == "densenet121":
         model = densenet.densenet121().to(device)
     # If you want to add extra model paste here
