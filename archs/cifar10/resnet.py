@@ -20,11 +20,10 @@ class BasicBlock(nn.Module):
         self.bn2 = nn.BatchNorm2d(planes)
 
         self.shortcut = nn.Sequential()
-        if stride != 1 or in_planes != self.expansion*planes:
-            self.shortcut = nn.Sequential(
-                nn.Conv2d(in_planes, self.expansion*planes, kernel_size=1, stride=stride, bias=False),
-                nn.BatchNorm2d(self.expansion*planes)
-            )
+        self.shortcut = nn.Sequential(
+            nn.Conv2d(in_planes, self.expansion*planes, kernel_size=1, stride=stride, bias=False),
+            nn.BatchNorm2d(self.expansion*planes)
+        )
 
     def forward(self, x):
         out = F.relu(self.bn1(self.conv1(x)))
@@ -47,11 +46,10 @@ class Bottleneck(nn.Module):
         self.bn3 = nn.BatchNorm2d(self.expansion*planes)
 
         self.shortcut = nn.Sequential()
-        if stride != 1 or in_planes != self.expansion*planes:
-            self.shortcut = nn.Sequential(
-                nn.Conv2d(in_planes, self.expansion*planes, kernel_size=1, stride=stride, bias=False),
-                nn.BatchNorm2d(self.expansion*planes)
-            )
+        self.shortcut = nn.Sequential(
+            nn.Conv2d(in_planes, self.expansion*planes, kernel_size=1, stride=stride, bias=False),
+            nn.BatchNorm2d(self.expansion*planes)
+        )
 
     def forward(self, x):
         out = F.relu(self.bn1(self.conv1(x)))
@@ -78,18 +76,19 @@ class ResNet(nn.Module):
         self.param_info = [{'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding': 1, 'name':'Conv1'},
                             {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Layer1Conv1'},
                             {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Layer1Conv2'},
-                            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'Layer1Shortcut', 'connects':[0,2]},
+                            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'Layer1Shortcut', 'connects':[1,4]},
                             {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':2, 'padding':1, 'name':'Layer2Conv1'},
                             {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Layer2Conv2'},
-                            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'Layer2Shortcut', 'connects':[2,5]},
+                            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'Layer2Shortcut', 'connects':[4,7]},
                             {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':2, 'padding':1, 'name':'Layer3Conv1'},
                             {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Layer3Conv2'},
-                            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'Layer3Shortcut', 'connects':[5,8]},
+                            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'Layer3Shortcut', 'connects':[7,10]},
                             {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':2, 'padding':1, 'name':'Layer4Conv1'},
                             {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Layer4Conv2'},
-                            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'Layer4Shortcut', 'connects':[8,11]},
+                            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'Layer4Shortcut', 'connects':[10,13]},
                             {'layer_type':'MaxPool2d', 'kernel_size':(4,4), 'stride':4, 'padding':0, 'name':'MaxPool'},
                             {'layer_type':'Linear', 'name': 'Linear1'}]
+
 
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1]*(num_blocks-1)
