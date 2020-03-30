@@ -73,21 +73,41 @@ class ResNet(nn.Module):
         self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
         self.linear = nn.Linear(512*block.expansion, num_classes)
 
-        self.param_info = [{'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding': 1, 'name':'Conv1'},
-                            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Layer1Conv1'},
-                            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Layer1Conv2'},
-                            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'Layer1Shortcut', 'connects':[1,4]},
-                            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':2, 'padding':1, 'name':'Layer2Conv1'},
-                            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Layer2Conv2'},
-                            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'Layer2Shortcut', 'connects':[4,7]},
-                            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':2, 'padding':1, 'name':'Layer3Conv1'},
-                            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Layer3Conv2'},
-                            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'Layer3Shortcut', 'connects':[7,10]},
-                            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':2, 'padding':1, 'name':'Layer4Conv1'},
-                            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Layer4Conv2'},
-                            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'Layer4Shortcut', 'connects':[10,13]},
-                            {'layer_type':'MaxPool2d', 'kernel_size':(4,4), 'stride':4, 'padding':0, 'name':'MaxPool'},
-                            {'layer_type':'Linear', 'name': 'Linear1'}]
+        self.param_info = [{'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding': 1, 'name':'conv1'},
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'layer1.0.conv1'},
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'layer1.0.conv2'},
+            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'layer1.0.shortcut', 'connects':[1,4]},
+
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'layer1.1.conv1'},
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'layer1.1.conv2'},
+            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'layer1.1.shortcut', 'connects':[4,7]},
+
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':2, 'padding':1, 'name':'layer2.0.conv1'},
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'layer2.0.conv2'},
+            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'layer2.0.shortcut', 'connects':[7,10]},
+
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'layer2.1.conv1'},
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'layer2.1.conv2'},
+            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'layer2.1.shortcut', 'connects':[10,13]},
+
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':2, 'padding':1, 'name':'layer3.0.conv1'},
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'layer3.0.conv2'},
+            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'layer3.0.shortcut', 'connects':[13,16]},
+
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'layer3.1.conv1'},
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'layer3.1.conv2'},
+            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'layer3.1.shortcut', 'connects':[16,19]},
+
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':2, 'padding':1, 'name':'layer4.0.conv1'},
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'layer4.0.conv2'},
+            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'layer4.0.shortcut', 'connects':[19,22]},
+
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'layer4.1.conv1'},
+            {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'layer4.1.conv2'},
+            {'layer_type': 'Shortcut', 'kernel_size': (1,1), 'stride':1, 'padding':0, 'name':'layer4.1.shortcut', 'connects':[22,25]},
+
+            {'layer_type':'MaxPool2d', 'kernel_size':(4,4), 'stride':4, 'padding':0, 'name':'MaxPool'},
+            {'layer_type':'Linear', 'name': 'Linear1'}]
 
 
     def _make_layer(self, block, planes, num_blocks, stride):
