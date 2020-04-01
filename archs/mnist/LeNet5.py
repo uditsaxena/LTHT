@@ -23,7 +23,8 @@ class LeNet5(nn.Module):
                             {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Conv2'},
                             {'layer_type':'MaxPool2d', 'kernel_size':(2,2), 'stride':2, 'padding':0, 'name':'MaxPool1'},
                             {'layer_type':'Linear', 'name': 'Linear1'},
-                            {'layer_type':'Linear', 'name': 'Linear2'}]
+                            {'layer_type':'Linear', 'name': 'Linear2'},
+                            {'layer_type':'Linear', 'name': 'Linear3'}]
 
 
     def forward(self, x):
@@ -56,7 +57,8 @@ class LeNet5_nmp(nn.Module):
                             {'layer_type': 'Conv2d', 'kernel_size':(3,3), 'stride':1, 'padding':1, 'name':'Conv2'},
                             {'layer_type':'Conv2d', 'kernel_size':(4,4), 'stride':2, 'padding':1, 'name':'Conv3'},
                             {'layer_type':'Linear', 'name': 'Linear1'},
-                            {'layer_type':'Linear', 'name': 'Linear2'}]
+                            {'layer_type':'Linear', 'name': 'Linear2'},
+                           {'layer_type': 'Linear', 'name': 'Linear3'}]
 
 
     def forward(self, x):

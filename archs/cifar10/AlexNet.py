@@ -39,6 +39,20 @@ class AlexNet(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(4096, num_classes),
         )
+        self.param_info = [{'layer_type': 'Conv2d', 'kernel_size': (3, 3), 'stride': 2, 'padding': 2, 'name': 'Conv1'},
+                           {'layer_type': 'MaxPool2d', 'kernel_size': (3, 3), 'stride': 2, 'padding': 0,
+                            'name': 'MaxPool1'},
+                           {'layer_type': 'Conv2d', 'kernel_size': (5, 5), 'stride': 1, 'padding': 2, 'name': 'Conv2'},
+                           {'layer_type': 'MaxPool2d', 'kernel_size': (3, 3), 'stride': 2, 'padding': 0,
+                            'name': 'MaxPool2'},
+                           {'layer_type': 'Conv2d', 'kernel_size': (3, 3), 'stride': 1, 'padding': 1, 'name': 'Conv3'},
+                           {'layer_type': 'Conv2d', 'kernel_size': (3, 3), 'stride': 1, 'padding': 1, 'name': 'Conv4'},
+                           {'layer_type': 'Conv2d', 'kernel_size': (3, 3), 'stride': 1, 'padding': 1, 'name': 'Conv5'},
+                           {'layer_type': 'MaxPool2d', 'kernel_size': (3, 3), 'stride': 2, 'padding': 0,
+                            'name': 'MaxPool3'},
+                           {'layer_type': 'Linear', 'name': 'Linear1'},
+                           {'layer_type': 'Linear', 'name': 'Linear2'},
+                           {'layer_type': 'Linear', 'name': 'Linear3'}, ]
 
     def forward(self, x):
         x = self.features(x)
@@ -79,6 +93,17 @@ class AlexNet_nmp(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(4096, num_classes),
         )
+        self.param_info = [{'layer_type': 'Conv2d', 'kernel_size': (3, 3), 'stride': 2, 'padding': 2, 'name': 'Conv1'},
+                           {'layer_type': 'Conv2d', 'kernel_size': (4, 4), 'stride': 2, 'padding': 1, 'name': 'Conv2'},
+                           {'layer_type': 'Conv2d', 'kernel_size': (5, 5), 'stride': 1, 'padding': 2, 'name': 'Conv3'},
+                           {'layer_type': 'Conv2d', 'kernel_size': (4, 4), 'stride': 2, 'padding': 1, 'name': 'Conv4'},
+                           {'layer_type': 'Conv2d', 'kernel_size': (3, 3), 'stride': 1, 'padding': 1, 'name': 'Conv5'},
+                           {'layer_type': 'Conv2d', 'kernel_size': (3, 3), 'stride': 1, 'padding': 1, 'name': 'Conv6'},
+                           {'layer_type': 'Conv2d', 'kernel_size': (3, 3), 'stride': 1, 'padding': 1, 'name': 'Conv7'},
+                           {'layer_type': 'Conv2d', 'kernel_size': (4, 4), 'stride': 2, 'padding': 1, 'name': 'Conv8'},
+                           {'layer_type': 'Linear', 'name': 'Linear1'},
+                           {'layer_type': 'Linear', 'name': 'Linear2'},
+                           {'layer_type': 'Linear', 'name': 'Linear3'}]
 
     def forward(self, x):
         x = self.features(x)

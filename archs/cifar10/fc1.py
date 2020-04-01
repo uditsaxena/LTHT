@@ -12,6 +12,9 @@ class fc1(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(100, num_classes),
         )
+        self.param_info = [{'layer_type': 'Linear', 'name': 'Linear1'},
+                           {'layer_type': 'Linear', 'name': 'Linear2'},
+                           {'layer_type': 'Linear', 'name': 'Linear3'}]
 
     def forward(self, x):
         x = torch.flatten(x, 1)

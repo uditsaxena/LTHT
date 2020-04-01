@@ -10,6 +10,11 @@ class LeNet5(nn.Module):
         self.fc1 = nn.Linear(16*5*5, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, num_classes)
+        self.param_info = [{'layer_type': 'Conv2d', 'kernel_size': (5, 5), 'stride': 1, 'padding': 0, 'name': 'Conv1'},
+                           {'layer_type': 'Conv2d', 'kernel_size': (5, 5), 'stride': 1, 'padding': 0, 'name': 'Conv2'},
+                           {'layer_type': 'Linear', 'name': 'Linear1'},
+                           {'layer_type': 'Linear', 'name': 'Linear2'},
+                           {'layer_type': 'Linear', 'name': 'Linear3'}]
 
     def forward(self, x):
         x = func.relu(self.conv1(x))
