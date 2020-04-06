@@ -95,13 +95,13 @@ def computer_per_model_homology(model_name, dataset, root_dir, epoch, model_loca
         print(("Architecture: {} not found, creating").format(architecture))
         NNG = nn_graph.NNGraph()
         NNG.parameter_graph(model, param_info, input_dim, ignore_zeros=True)
-        model_graph_dict[architecture] = NNG
+        # model_graph_dict[architecture] = NNG
     else:
         print(("Architecture: {} found, loading ... ").format(architecture))
-        NNG = model_graph_dict[architecture]
-        NNG.update_adjacency(model)
+        # NNG = model_graph_dict[architecture]
+        # NNG.update_adjacency(model)
 
-    rips = ripser(scipy.sparse.csr_matrix(NNG.get_adjacency()), distance_matrix=True, maxdim=2, do_cocycles=True)
+    rips = ripser(nx.to_scipy_sparse_matrix(NNG.G), distance_matrix=True, maxdim=2, do_cocycles=True)
     # root_dir contains something in the format of:
     # /home/udit/programs/LTHT/remote_data/saves/alexnet_nmp/mnist/0/
 
