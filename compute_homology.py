@@ -73,7 +73,7 @@ def compute_homology(model, dataset, root_dir):
                     computer_per_model_homology(model, dataset, root_dir, listed_file,
                                                 best_model_per_pruning_it_location)
 
-                
+
 
 
 def computer_per_model_homology(model_name, dataset, root_dir, epoch, model_location):
@@ -82,7 +82,7 @@ def computer_per_model_homology(model_name, dataset, root_dir, epoch, model_loca
     persim_image_dir = root_dir + "persim/"
     # print(persim_image_dir)
 
-    model = torch.load(model_location)
+    model = torch.load(model_location, map_location=torch.device('cpu'))
     if dataset == 'mnist':
         input_dim = (1, 1, 28, 28)
     elif dataset == 'cifar10':
