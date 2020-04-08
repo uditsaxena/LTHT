@@ -46,7 +46,7 @@ def get_model_param_info(model_name, dataset):
         "alexnet_cifar10": AlexNet_cifar10,
         "alexnet_nmp_cifar10": AlexNet_nmp_cifar10,
 
-        "lenet5_mnist": AlexNet_mnist,
+        "lenet5_mnist": LeNet5_mnist,
         "lenet5_nmp_mnist": LeNet5_nmp_mnist,
         "lenet5_cifar10": LeNet5_cifar10,
         "lenet5_nmp_cifar10": LeNet5_nmp_cifar10,
