@@ -82,7 +82,7 @@ def computer_per_model_homology(model_name, dataset, root_dir, epoch, model_loca
     persim_image_dir = root_dir + "persim/"
     # print(persim_image_dir)
 
-    model = torch.load(model_location)
+    model = torch.load(model_location, map_location=torch.device('cpu'))
     if dataset == 'mnist':
         input_dim = (1, 1, 28, 28)
     elif dataset == 'cifar10':
@@ -95,14 +95,15 @@ def computer_per_model_homology(model_name, dataset, root_dir, epoch, model_loca
         print(("Architecture: {} not found, creating").format(architecture))
         NNG = nn_graph.NNGraph()
         NNG.parameter_graph(model, param_info, input_dim, ignore_zeros=True)
-        model_graph_dict[architecture] = NNG
+        # model_graph_dict[architecture] = NNG
     else:
         print(("Architecture: {} found, loading ... ").format(architecture))
-        NNG = model_graph_dict[architecture]
-        NNG.update_adjacency(model)
+        # NNG = model_graph_dict[architecture]
+        # NNG.update_adjacency(model)
 
     print('Computing Homology')
     rips = ripser(nx.to_scipy_sparse_matrix(NNG.G), distance_matrix=True, maxdim=1, do_cocycles=True)
+
     # root_dir contains something in the format of:
     # /home/udit/programs/LTHT/remote_data/saves/alexnet_nmp/mnist/0/
 
