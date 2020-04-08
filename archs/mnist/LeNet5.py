@@ -37,13 +37,13 @@ class LeNet5_nmp(nn.Module):
     def __init__(self, num_classes=10):
         super(LeNet5_nmp, self).__init__()
         self.features = nn.Sequential(
-            nn.Conv2d(1, 64, kernel_size=(3, 3), stride=1, padding=1),
+            nn.Conv2d(1, 64, kernel_size=(3,3), stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(64, 64, kernel_size=(3, 3), stride=1, padding=1),
+            nn.Conv2d(64, 64, kernel_size=(3,3), stride=1, padding=1),
             nn.ReLU(),
             # nn.MaxPool2d(kernel_size=2),
             # nn.Flatten(),
-            nn.Conv2d(64, 64, kernel_size=(4, 4), stride=2, padding=1)
+            nn.Conv2d(64, 64, kernel_size=(4,4), stride=2, padding=1)
         )
         self.classifier = nn.Sequential(
             nn.Linear(64*14*14, 256),

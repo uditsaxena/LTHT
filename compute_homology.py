@@ -73,7 +73,7 @@ def compute_homology(model, dataset, root_dir):
                     computer_per_model_homology(model, dataset, root_dir, listed_file,
                                                 best_model_per_pruning_it_location)
 
-                
+
 
 
 def computer_per_model_homology(model_name, dataset, root_dir, epoch, model_location):
@@ -101,7 +101,8 @@ def computer_per_model_homology(model_name, dataset, root_dir, epoch, model_loca
         NNG = model_graph_dict[architecture]
         NNG.update_adjacency(model)
 
-    rips = ripser(scipy.sparse.csr_matrix(NNG.get_adjacency()), distance_matrix=True, maxdim=2, do_cocycles=True)
+    print('Computing Homology')
+    rips = ripser(nx.to_scipy_sparse_matrix(NNG.G), distance_matrix=True, maxdim=1, do_cocycles=True)
     # root_dir contains something in the format of:
     # /home/udit/programs/LTHT/remote_data/saves/alexnet_nmp/mnist/0/
 
