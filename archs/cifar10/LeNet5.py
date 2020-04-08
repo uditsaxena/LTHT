@@ -13,7 +13,7 @@ class LeNet5(nn.Module):
         self.param_info = [{'layer_type': 'Conv2d', 'kernel_size': (5, 5), 'stride': 1, 'padding': 0, 'name': 'Conv1'},
                             {'layer_type':'MaxPool2d', 'kernel_size':(2,2), 'stride':2, 'padding':0, 'name':'MaxPool1'},
                            {'layer_type': 'Conv2d', 'kernel_size': (5, 5), 'stride': 1, 'padding': 0, 'name': 'Conv2'},
-                           {'layer_type':'MaxPool2d', 'kernel_size':(2,2), 'stride':2, 'padding':0, 'name':'MaxPool2'}
+                           {'layer_type':'MaxPool2d', 'kernel_size':(2,2), 'stride':2, 'padding':0, 'name':'MaxPool2'},
                            {'layer_type': 'Linear', 'name': 'Linear1'},
                            {'layer_type': 'Linear', 'name': 'Linear2'},
                            {'layer_type': 'Linear', 'name': 'Linear3'}]
