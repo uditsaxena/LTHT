@@ -74,7 +74,10 @@ def compute_homology(model, dataset, root_dir):
                                                 best_model_per_pruning_it_location)
 
 
-
+def sparse_min_row(csr_mat):
+    ret = np.zeros(csr_mat.shape[0])
+    ret[np.diff(csr_mat.indptr) != 0] = np.minimum.reduceat(csr_mat.data,csr_mat.indptr[:-1][np.diff(csr_mat.indptr)>0])
+    return ret
 
 def computer_per_model_homology(model_name, dataset, root_dir, epoch, model_location):
     rips_pickle_dir = root_dir + "pickle/"
@@ -102,7 +105,10 @@ def computer_per_model_homology(model_name, dataset, root_dir, epoch, model_loca
         # NNG.update_adjacency(model)
 
     print('Computing Homology')
-    rips = ripser(nx.to_scipy_sparse_matrix(NNG.G), distance_matrix=True, maxdim=1, do_cocycles=True)
+    sps = nx.to_scipy_sparse_matrix(NNG.G)
+    mrs = sparse_min_row(sps)
+    sps.setdiag(mrs)
+    rips = ripser(sps, distance_matrix=True, maxdim=1, do_cocycles=True)
 
     # root_dir contains something in the format of:
     # /home/udit/programs/LTHT/remote_data/saves/alexnet_nmp/mnist/0/
