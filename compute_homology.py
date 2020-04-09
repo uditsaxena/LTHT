@@ -62,8 +62,8 @@ def get_model_param_info(model_name, dataset):
     return param_info
 
 
-def compute_homology(model, dataset, root_dir):
-    for listed_file in sorted(os.listdir(root_dir)):
+def compute_homology(model, dataset, root_dir, restart_at=0):
+    for listed_file in sorted(os.listdir(root_dir))[restart_at:]:
         if (listed_file[0].isdigit()):
             print("epoch: ", listed_file)
             if listed_file != ".ipynb_checkpoints":
@@ -135,12 +135,13 @@ def main(args):
     model_name = args.model_name
     dataset = args.dataset
     seed = args.seed
+    restart_at = args.restart_at
 
     model_dataset_seed_dir = ROOT_DIR + "{}/{}/{}/".format(model_name, dataset, seed)
     print("In: ", model_dataset_seed_dir)
 
     if (os.path.isdir(model_dataset_seed_dir)):
-        compute_homology(model_name, dataset, model_dataset_seed_dir)
+        compute_homology(model_name, dataset, model_dataset_seed_dir, restart_at=restart_at)
 
 
 if __name__ == '__main__':
@@ -150,6 +151,7 @@ if __name__ == '__main__':
     parser.add_argument("--model_name", default='lenet5_nmp', type=str)
     parser.add_argument("--dataset", default='mnist', type=str)
     parser.add_argument("--seed", default='0', type=str)
+    parser.add_argument("--restart_at", default=0, type=int)
 
     args = parser.parse_args()
     print(args)
