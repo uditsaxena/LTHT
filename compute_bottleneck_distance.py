@@ -49,7 +49,7 @@ def compute_bottleneck_distance(all_seeds_rips_files, remove_infinity=False, com
 
         matrix.append(row)
     #
-    x = list(map(lambda y:'Seed-{}-iter-{}'.format(y.split('-')[0], y.split('-')[1]), x))
+    x = list(map(lambda y:'Seed {}-{}'.format(y.split('-')[0], y.split('-')[1]), x))
     return matrix, x
     #
 def main(args):
@@ -57,6 +57,9 @@ def main(args):
     model_name = args.model_name
     dataset = args.dataset
     seeds = [0, 42, 1337]
+    wass = args.compute_wass_distance
+
+    dist_type = 'wasserstein' if wass else 'bottleneck'
 
     # load list of files
     all_files = []
@@ -69,13 +72,13 @@ def main(args):
                                                  remove_infinity=args.remove_infinity,
                                                  compute_wass_distance=args.compute_wass_distance)
     if args.remove_infinity:
-        filename = ROOT_DIR + "{}/{}/".format(model_name, dataset) + "{}-{}_no_inf".format(model_name, dataset)
+        filename = ROOT_DIR + "{}/{}/".format(model_name, dataset) + "{}-{}_{}_no_inf".format(model_name, dataset, dist_type)
     else:
-        filename = ROOT_DIR + "{}/{}/".format(model_name, dataset) + "{}-{}".format(model_name, dataset)
+        filename = ROOT_DIR + "{}/{}/".format(model_name, dataset) + "{}-{}_{}".format(model_name, dataset, dist_type)
     np.save(filename+".npy", matrix)
-    heat_map = sns.heatmap(np.asarray(matrix), annot=True, xticklabels=x, yticklabels=x, fmt='.2f')
-    heat_map.set_xticklabels(heat_map.get_xticklabels(), rotation=45)
-    heat_map.set_yticklabels(heat_map.get_yticklabels(), rotation=45)
+    heat_map = sns.heatmap(np.asarray(matrix), annot=True, xticklabels=labels, yticklabels=labels, fmt='.2f', annot_kws={"size": 10})
+    heat_map.set_xticklabels(heat_map.get_xticklabels(), rotation=90)
+    heat_map.set_yticklabels(heat_map.get_yticklabels(), rotation=0)
     plt.savefig(filename+".jpg".format(model_name, dataset))
 
 
@@ -86,7 +89,7 @@ if __name__ == '__main__':
     parser.add_argument("--model_name", default='fc1', type=str)
     parser.add_argument("--dataset", default='mnist', type=str)
     parser.add_argument("--remove_infinity", action='store_true')
-    parser.add_argument("--compute_wass_distance", action='store_false',
+    parser.add_argument("--compute_wass_distance", action='store_true',
                         help="Compute wasserstein distance instead of bottleneck distance")
 
     args = parser.parse_args()
