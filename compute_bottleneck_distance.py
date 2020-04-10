@@ -73,7 +73,7 @@ def main(args):
     else:
         filename = ROOT_DIR + "{}/{}/".format(model_name, dataset) + "{}-{}".format(model_name, dataset)
     np.save(filename+".npy", matrix)
-    heat_map = sb.heatmap(np.asarray(matrix), annot=True, xticklabels=x, yticklabels=x, fmt='.2f')
+    heat_map = sns.heatmap(np.asarray(matrix), annot=True, xticklabels=x, yticklabels=x, fmt='.2f')
     heat_map.set_xticklabels(heat_map.get_xticklabels(), rotation=45)
     heat_map.set_yticklabels(heat_map.get_yticklabels(), rotation=45)
     plt.savefig(filename+".jpg".format(model_name, dataset))
