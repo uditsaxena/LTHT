@@ -139,7 +139,7 @@ def main(args):
     prune_all = args.prune_all
 
     if prune_all:
-        model_dataset_seed_dir = ROOT_DIR + "{}/{}/prune_all/{}/".format(model_name, dataset, seed)
+        model_dataset_seed_dir = ROOT_DIR + "{}/{}/{}/prune_all/".format(model_name, dataset, seed)
     else:
         model_dataset_seed_dir = ROOT_DIR + "{}/{}/{}/".format(model_name, dataset, seed)
     print("In: ", model_dataset_seed_dir)
