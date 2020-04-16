@@ -61,8 +61,8 @@ def compute_bottleneck_distance(all_seeds_rips_files, remove_infinity=False, com
     #
 def main(args):
     ROOT_DIR = args.root_dir
-    model_name = args.model_name
-    dataset = args.dataset
+    model_name_list = args.model_name
+    dataset_list = args.dataset
     seeds = [0, 42, 1337]
     wass = args.compute_wass_distance
     persim = args.use_persim
@@ -72,11 +72,14 @@ def main(args):
 
     # load list of files
     all_files = []
-    for seed in seeds:
-        rips_dir = ROOT_DIR + "{}/{}/{}/pickle/".format(model_name, dataset, seed)
-        print(rips_dir)
-        files = sorted([rips_dir+f for f in os.listdir(rips_dir) if not f.startswith('.')])
-        all_files.extend(files)
+    for model_name in model_name_list:
+        for dataset in dataset_list:
+            for seed in seeds:
+                rips_dir = ROOT_DIR + "{}/{}/{}/pickle/".format(model_name, dataset, seed)
+                print(rips_dir)
+                files = sorted([rips_dir+f for f in os.listdir(rips_dir) if not f.startswith('.')])
+                all_files.extend(files)
+    print(all_files)
     matrix, labels = compute_bottleneck_distance(all_files,
                                                  remove_infinity=args.remove_infinity,
                                                  compute_wass_distance=args.compute_wass_distance,
@@ -95,11 +98,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--root_dir", default="/home/udit/programs/LTHT/data/saves/", type=str)
-    parser.add_argument("--model_name", default='fc1', type=str)
-    parser.add_argument("--dataset", default='mnist', type=str)
-    parser.add_argument("--M", default=10, type=int)
+    parser.add_argument("--model_name", default='fc1', nargs='+', type=str)
+    parser.add_argument("--dataset", default='mnist', nargs='+', type=str)
     parser.add_argument("--remove_infinity", action='store_true')
     parser.add_argument("--use-persim", action='store_true')
+    parser.add_argument("--M", default=10, type=int)
     parser.add_argument("--compute_wass_distance", action='store_true',
                         help="Compute wasserstein distance instead of bottleneck distance")
 

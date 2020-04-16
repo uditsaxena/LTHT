@@ -95,10 +95,14 @@ def main(args, ITE=0):
     # Weight Initialization
     model.apply(weight_init)
 
+    prune_model_type = "prune_all"
+    if (args.prune_only_conv == 1):
+        prune_model_type = "prune_conv"
+
     # Copying and Saving Initial State
     initial_state_dict = copy.deepcopy(model.state_dict())
-    utils.checkdir(f"{os.getcwd()}/saves/{args.arch_type}/{args.dataset}/{args.seed}/")
-    torch.save(model, f"{os.getcwd()}/saves/{args.arch_type}/{args.dataset}/{args.seed}/initial_state_dict_{args.prune_type}.pth.tar")
+    utils.checkdir(f"{os.getcwd()}/saves/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/")
+    torch.save(model, f"{os.getcwd()}/saves/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/initial_state_dict_{args.prune_type}.pth.tar")
 
     # Making Initial Mask
     make_mask(model)
@@ -183,8 +187,8 @@ def main(args, ITE=0):
                 # Save Weights
                 if accuracy > best_accuracy:
                     best_accuracy = accuracy
-                    utils.checkdir(f"{os.getcwd()}/saves/{args.arch_type}/{args.dataset}/{args.seed}/{_ite}/")
-                    torch.save(model,f"{os.getcwd()}/saves/{args.arch_type}/{args.dataset}/{args.seed}/{_ite}/model_{args.prune_type}_{args.prune_percent}.pth.tar")
+                    utils.checkdir(f"{os.getcwd()}/saves/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/{_ite}/")
+                    torch.save(model,f"{os.getcwd()}/saves/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/{_ite}/model_{args.prune_type}_{args.prune_percent}.pth.tar")
 
             # Training
             loss = train(model, train_loader, optimizer, criterion)
@@ -209,18 +213,18 @@ def main(args, ITE=0):
         plt.ylabel("Loss and Accuracy")
         plt.legend()
         plt.grid(color="gray")
-        utils.checkdir(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/")
-        plt.savefig(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_LossVsAccuracy_{comp1}_{args.prune_percent}.png", dpi=1200)
+        utils.checkdir(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/")
+        plt.savefig(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/{args.prune_type}_LossVsAccuracy_{comp1}_{args.prune_percent}.png", dpi=1200)
         plt.close()
 
         # Dump Plot values
-        utils.checkdir(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/")
-        all_loss.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_all_loss_{comp1}_{args.prune_percent}.dat")
-        all_accuracy.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_all_accuracy_{comp1}_{args.prune_percent}.dat")
+        utils.checkdir(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/")
+        all_loss.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/{args.prune_type}_all_loss_{comp1}_{args.prune_percent}.dat")
+        all_accuracy.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/{args.prune_type}_all_accuracy_{comp1}_{args.prune_percent}.dat")
 
         # Dumping mask
-        utils.checkdir(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/")
-        with open(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_mask_{comp1}_{args.prune_percent}.pkl", 'wb') as fp:
+        utils.checkdir(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/")
+        with open(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/{args.prune_type}_mask_{comp1}_{args.prune_percent}.pkl", 'wb') as fp:
             pickle.dump(mask, fp)
 
         # Making variables into 0
@@ -229,9 +233,9 @@ def main(args, ITE=0):
         all_accuracy = np.zeros(args.end_iter,float)
 
     # Dumping Values for Plotting
-    utils.checkdir(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/")
-    comp.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_{args.prune_percent}_compression.dat")
-    bestacc.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_{args.prune_percent}_bestaccuracy.dat")
+    utils.checkdir(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/")
+    comp.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/{args.prune_type}_{args.prune_percent}_compression.dat")
+    bestacc.dump(f"{os.getcwd()}/dumps/lt/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/{args.prune_type}_{args.prune_percent}_bestaccuracy.dat")
 
     # Plotting
     a = np.arange(args.prune_iterations)
@@ -243,8 +247,8 @@ def main(args, ITE=0):
     plt.ylim(0,100)
     plt.legend()
     plt.grid(color="gray")
-    utils.checkdir(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/")
-    plt.savefig(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/{args.prune_type}_{args.prune_percent}_AccuracyVsWeights.png", dpi=1200)
+    utils.checkdir(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/")
+    plt.savefig(f"{os.getcwd()}/plots/lt/{args.arch_type}/{args.dataset}/{args.seed}/{prune_model_type}/{args.prune_type}_{args.prune_percent}_AccuracyVsWeights.png", dpi=1200)
     plt.close()
 
 # Function for Training
