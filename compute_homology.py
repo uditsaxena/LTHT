@@ -97,7 +97,7 @@ def computer_per_model_homology(model_name, dataset, root_dir, epoch, model_loca
     if (architecture not in model_graph_dict) or (epoch == 0):
         print(("Architecture: {} not found, creating").format(architecture))
         NNG = nn_graph.NNGraph()
-        NNG.parameter_graph(model, param_info, input_dim, ignore_zeros=True)
+        NNG.parameter_graph(model, param_info, input_dim, ignore_zeros=True, verbose=True)
         # model_graph_dict[architecture] = NNG
     else:
         print(("Architecture: {} found, loading ... ").format(architecture))
@@ -136,8 +136,12 @@ def main(args):
     dataset = args.dataset
     seed = args.seed
     restart_at = args.restart_at
+    prune_all = args.prune_all
 
-    model_dataset_seed_dir = ROOT_DIR + "{}/{}/{}/".format(model_name, dataset, seed)
+    if prune_all:
+        model_dataset_seed_dir = ROOT_DIR + "{}/{}/{}/prune_all/".format(model_name, dataset, seed)
+    else:
+        model_dataset_seed_dir = ROOT_DIR + "{}/{}/{}/".format(model_name, dataset, seed)
     print("In: ", model_dataset_seed_dir)
 
     if (os.path.isdir(model_dataset_seed_dir)):
@@ -152,6 +156,7 @@ if __name__ == '__main__':
     parser.add_argument("--dataset", default='mnist', type=str)
     parser.add_argument("--seed", default='0', type=str)
     parser.add_argument("--restart_at", default=0, type=int)
+    parser.add_argument("--prune_all", action='store_true')
 
     args = parser.parse_args()
     print(args)
