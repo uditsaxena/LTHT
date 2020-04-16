@@ -97,7 +97,7 @@ def computer_per_model_homology(model_name, dataset, root_dir, epoch, model_loca
     if (architecture not in model_graph_dict) or (epoch == 0):
         print(("Architecture: {} not found, creating").format(architecture))
         NNG = nn_graph.NNGraph()
-        NNG.parameter_graph(model, param_info, input_dim, ignore_zeros=True)
+        NNG.parameter_graph(model, param_info, input_dim, ignore_zeros=True, verbose=True)
         # model_graph_dict[architecture] = NNG
     else:
         print(("Architecture: {} found, loading ... ").format(architecture))
