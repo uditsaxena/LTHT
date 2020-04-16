@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 plt.rcParams["figure.figsize"] = (20,20)
 
 
-def compute_bottleneck_distance(all_seeds_rips_files, remove_infinity=False, compute_wass_distance=False):
+def compute_bottleneck_distance(all_seeds_rips_files, remove_infinity=False, compute_wass_distance=False,
+                                use_persim=False, M=10):
     matrix = []
     x = []
     y = []
@@ -41,10 +42,16 @@ def compute_bottleneck_distance(all_seeds_rips_files, remove_infinity=False, com
             d2 = dion.Diagram(l2)
 
             if compute_wass_distance:
-                wdist = dion.wasserstein_distance(d1, d2, q=2)
+                if use_persim:
+                    wdist = persim.sliced_wasserstein_kernel(d1,d2,M=M)
+                else:
+                    wdist = dion.wasserstein_distance(d1, d2, q=2)
                 row[i] = wdist
             else:
-                bdist = dion.bottleneck_distance(d1, d2)
+                if use_persim:
+                    bdist = persim.bottleneck(d1,d2)
+                else:
+                    bdist = dion.bottleneck_distance(d1, d2)
                 row[i] = bdist
 
         matrix.append(row)
@@ -58,6 +65,8 @@ def main(args):
     dataset = args.dataset
     seeds = [0, 42, 1337]
     wass = args.compute_wass_distance
+    persim = args.use_persim
+    M = args.M
 
     dist_type = 'wasserstein' if wass else 'bottleneck'
 
@@ -70,7 +79,8 @@ def main(args):
         all_files.extend(files)
     matrix, labels = compute_bottleneck_distance(all_files,
                                                  remove_infinity=args.remove_infinity,
-                                                 compute_wass_distance=args.compute_wass_distance)
+                                                 compute_wass_distance=args.compute_wass_distance,
+                                                 M=M, use_persim=persim)
     if args.remove_infinity:
         filename = ROOT_DIR + "{}/{}/".format(model_name, dataset) + "{}-{}_{}_no_inf".format(model_name, dataset, dist_type)
     else:
@@ -81,14 +91,15 @@ def main(args):
     heat_map.set_yticklabels(heat_map.get_yticklabels(), rotation=0)
     plt.savefig(filename+".jpg".format(model_name, dataset))
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--root_dir", default="/home/udit/programs/LTHT/data/saves/", type=str)
     parser.add_argument("--model_name", default='fc1', type=str)
     parser.add_argument("--dataset", default='mnist', type=str)
+    parser.add_argument("--M", default=10, type=int)
     parser.add_argument("--remove_infinity", action='store_true')
+    parser.add_argument("--use-persim", action='store_true')
     parser.add_argument("--compute_wass_distance", action='store_true',
                         help="Compute wasserstein distance instead of bottleneck distance")
 
