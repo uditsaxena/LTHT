@@ -61,7 +61,7 @@ def get_model_param_info(model_name, dataset):
 
 
 def compute_graph_metrics(model_name, dataset, seed, root_dir):
-    columns = ["prune_iter", "s_metric", "wiener_index", "avg_clustering", "node_connectivity", "diameter", "local_efficiency", "global_efficiency", "overall_reciprocity"]
+    columns = ["prune_iter", "s_metric", "degree_assortativity_coefficient", "diameter", "global_efficiency"]
     rows = []
     for prune_iter in sorted(os.listdir(root_dir)):
         if (prune_iter[0].isdigit()):
@@ -70,18 +70,20 @@ def compute_graph_metrics(model_name, dataset, seed, root_dir):
                 best_model_per_pruning_it_location = root_dir + prune_iter + "/" + "model_lt_20.pth.tar"
                 # print(best_model_per_pruning_it_location)
                 if (os.path.isfile(best_model_per_pruning_it_location)):
-                    row = [prune_iter]
+                    row = [int(prune_iter)]
                     metrics_list = compute_model_graph_metrics(model_name, dataset, root_dir, prune_iter,
                                                best_model_per_pruning_it_location)
-                    row.append(metrics_list)
+                    row.extend(metrics_list)
         rows.append(row)
+        
     df = pd.DataFrame(rows, columns=columns)
     for metric in columns: 
-        plt.clf()
+        if metric != "prune_iter":
+            plt.clf()
 
-        sns.lineplot(x='prune_iter',y=metric, data=df).set_title("prune_iter vs {}".format(metric))
-        file_loc = root_dir + "{}-{}-{}-{}".format(model_name, dataset, seed, metric)
-        plt.savefig(file_loc+".jpg")
+            sns.lineplot(x='prune_iter',y=metric, data=df).set_title("prune_iter vs {}".format(metric))
+            file_loc = root_dir + "{}-{}-{}-{}".format(model_name, dataset, seed, metric)
+            plt.savefig(file_loc+".jpg")
 
 def compute_model_graph_metrics(model_name, dataset, root_dir, epoch, model_location):
     model = torch.load(model_location)
@@ -99,16 +101,12 @@ def compute_model_graph_metrics(model_name, dataset, root_dir, epoch, model_loca
         NNG.parameter_graph(model, param_info, input_dim, ignore_zeros=True)
         
     s_metric = nx.s_metric(NNG.G, normalized=False)
-    wiener_index = nx.wiener_index(NNG.G, weight='weight')
-    avg_clustering = nx.average_clustering(NNG.G, weight='weight')
-    node_connectivity = nx.node_connectivity(NNG.G)
+    degree_assortativity_coefficient = nx.degree_assortativity_coefficient(NNG.G)
     
     diameter = nx.diameter(NNG.G)
-    local_efficiency = nx.local_efficiency(NNG.G)
     global_efficiency = nx.global_efficiency(NNG.G)
-    overall_reciprocity = nx.overall_reciprocity(NNG.G)
     
-    return [s_metric, wiener_index, avg_clustering, node_connectivity, diameter, local_efficiency, global_efficiency, overall_reciprocity]
+    return [s_metric, degree_assortativity_coefficient, diameter, global_efficiency]
     
 def main(args):
     ROOT_DIR = args.root_dir
@@ -130,8 +128,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--root_dir", default="/home/udit/programs/LTHT/remote_data/saves/", type=str)
-    parser.add_argument("--model_name", nargs='+', default='fc1', type=str)
-    parser.add_argument("--dataset", nargs='+', default='mnist', type=str)
+    parser.add_argument("--model_name", nargs='+', default=['fc1'], type=str)
+    parser.add_argument("--dataset", nargs='+', default=['mnist'], type=str)
     parser.add_argument("--seed", nargs='+', default='0', type=str)
 
     args = parser.parse_args()
