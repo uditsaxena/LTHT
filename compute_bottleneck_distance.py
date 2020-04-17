@@ -20,9 +20,9 @@ def compute_bottleneck_distance(all_seeds_rips_files, remove_infinity=False, com
         row = np.zeros(len(all_seeds_rips_files))
         # example file1: LTHT/remote_data/saves/alexnet_nmp/mnist/42/pickle/8.pickle
         split1_name = file1.split('/')
-        seed, model_name, file1_name = split1_name[-4], split1_name[-5], split1_name[-1]
-        # appending '42-8'
-        x.append(model_name + "-" +seed+"-"+file1_name.split(".")[0])
+        seed, model_name, dataset, file1_name = split1_name[-3], split1_name[-5], split1_name[-4], split1_name[-1]
+        # appending 'alexnet_nmp-mnist-42-8'
+        x.append(model_name + "-" +dataset+ "-" + seed + "-" + file1_name.split(".")[0])
 
         rips1 = pickle.load(open(file1, 'rb'))
         if remove_infinity:
@@ -56,14 +56,14 @@ def compute_bottleneck_distance(all_seeds_rips_files, remove_infinity=False, com
 
         matrix.append(row)
     #
-    x = list(map(lambda y:'{} - Seed {}-{}'.format(y.split('-')[0], y.split('-')[1], y.split('-')[2]), x))
+    x = list(map(lambda y:'{}-{} seed-{}-{}'.format(y.split('-')[0], y.split('-')[1], y.split('-')[2], y.split('-')[3]), x))
     return matrix, x
     #
 def main(args):
     ROOT_DIR = args.root_dir
     model_name_list = args.model_name
     dataset_list = args.dataset
-    seeds = [0] #, 42, 1337]
+    seeds = args.seeds
     wass = args.compute_wass_distance
     persim = args.use_persim
     M = args.M
@@ -98,11 +98,12 @@ def main(args):
     print(model_name_str)
     dataset_str = "-".join(dataset_list)
     print(dataset_str)
+    seeds_str = "-".join(seeds)
     if args.remove_infinity:
-        filename = ROOT_DIR + "{}-{}_{}_{}_no_inf".format(model_name_str, dataset_str, dist_type, prune_str)
+        filename = ROOT_DIR + "{}-{}-{}_{}_{}_no_inf".format(model_name_str, dataset_str, seeds_str, dist_type, prune_str)
 #                 filename = ROOT_DIR + "{}/{}/".format(model_name, dataset) + "{}-{}_{}_{}_no_inf".format(model_name, dataset, dist_type, prune_str)
     else:
-        filename = ROOT_DIR + "{}-{}_{}_{}".format(model_name_str, dataset_str, dist_type, prune_str)
+        filename = ROOT_DIR + "{}-{}-{}_{}_{}".format(model_name_str, dataset_str, seeds_str, dist_type, prune_str)
     np.save(filename+".npy", matrix)
     heat_map = sns.heatmap(np.asarray(matrix), annot=True, xticklabels=labels, yticklabels=labels, fmt='.2f', annot_kws={"size": 10})
     heat_map.set_xticklabels(heat_map.get_xticklabels(), rotation=90)
@@ -114,8 +115,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--root_dir", default="/home/udit/programs/LTHT/data/saves/", type=str)
-    parser.add_argument("--model_name", default='fc1', nargs='+', type=str)
-    parser.add_argument("--dataset", default='mnist', nargs='+', type=str)
+    parser.add_argument("--model_name", default=['fc1'], nargs='+', type=str)
+    parser.add_argument("--dataset", default=['mnist'], nargs='+', type=str)
+    parser.add_argument("--seeds", default=['0'], nargs='+', type=str)
     parser.add_argument("--remove_infinity", action='store_true')
     parser.add_argument("--use-persim", action='store_true')
     parser.add_argument("--M", default=10, type=int)
