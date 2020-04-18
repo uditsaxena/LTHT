@@ -137,11 +137,18 @@ def main(args):
     seed = args.seed
     restart_at = args.restart_at
     prune_all = args.prune_all
+    prune_scale = args.prune_scale
 
-    if prune_all:
-        model_dataset_seed_dir = ROOT_DIR + "{}/{}/{}/prune_all/".format(model_name, dataset, seed)
+    if prune_scale is not None:
+        if prune_all:
+            model_dataset_seed_dir = ROOT_DIR + "{}/{}/{}/prune_all/{}/".format(model_name, dataset, seed, prune_scale)
+        else:
+            model_dataset_seed_dir = ROOT_DIR + "{}/{}/{}/{}/".format(model_name, dataset, seed, prune_scale)
     else:
-        model_dataset_seed_dir = ROOT_DIR + "{}/{}/{}/".format(model_name, dataset, seed)
+        if prune_all:
+            model_dataset_seed_dir = ROOT_DIR + "{}/{}/{}/prune_all/".format(model_name, dataset, seed)
+        else:
+            model_dataset_seed_dir = ROOT_DIR + "{}/{}/{}/".format(model_name, dataset, seed)
     print("In: ", model_dataset_seed_dir)
 
     if (os.path.isdir(model_dataset_seed_dir)):
@@ -157,6 +164,7 @@ if __name__ == '__main__':
     parser.add_argument("--seed", default='0', type=str)
     parser.add_argument("--restart_at", default=0, type=int)
     parser.add_argument("--prune_all", action='store_true')
+    parser.add_argument("--prune_scale", default=None, type=str)
 
     args = parser.parse_args()
     print(args)
