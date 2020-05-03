@@ -36,13 +36,14 @@ def main(args, ITE=0):
     reinit = True if args.prune_type=="reinit" else False
 
     # Data Loader
-    transform=transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.1307,), (0.3081,))])
     if args.dataset == "mnist":
+        transform=transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.1307,), (0.3081,))])
         traindataset = datasets.MNIST('../data', train=True, download=True,transform=transform)
         testdataset = datasets.MNIST('../data', train=False, transform=transform)
         from archs.mnist import AlexNet, LeNet5, fc1, vgg, resnet, resnet_nmp
 
     elif args.dataset == "cifar10":
+        transform=transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261))])
         traindataset = datasets.CIFAR10('../data', train=True, download=True,transform=transform)
         testdataset = datasets.CIFAR10('../data', train=False, transform=transform)
         from archs.cifar10 import AlexNet, LeNet5, fc1, vgg, resnet, densenet, resnet_nmp
@@ -73,12 +74,20 @@ def main(args, ITE=0):
        model = fc1.fc1().to(device)
     elif args.arch_type == "lenet5":
         model = LeNet5.LeNet5().to(device)
+    elif args.arch_type == "lenet5_bn":
+        model = LeNet5.LeNet5_bn().to(device)
     elif args.arch_type == "lenet5_nmp":
         model = LeNet5.LeNet5_nmp().to(device)
+    elif args.arch_type == "lenet5_nmp_bn":
+        model = LeNet5.LeNet5_nmp_bn().to(device)
     elif args.arch_type == "alexnet":
         model = AlexNet.AlexNet().to(device)
+    elif args.arch_type == "alexnet_bn":
+        model = AlexNet.AlexNet_bn().to(device)
     elif args.arch_type == "alexnet_nmp":
         model = AlexNet.AlexNet_nmp().to(device)
+    elif args.arch_type == "alexnet_nmp_bn":
+        model = AlexNet.AlexNet_nmp_bn().to(device)
     elif args.arch_type == "vgg16":
         model = vgg.vgg16().to(device)
     elif args.arch_type == "resnet18":
