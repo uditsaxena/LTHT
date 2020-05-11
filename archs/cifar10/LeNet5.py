@@ -92,15 +92,15 @@ class LeNet5_nmp(nn.Module):
 class LeNet5_nmp_bn(nn.Module):
     def __init__(self, num_classes=10):
         super(LeNet5_nmp_bn, self).__init__()
-        self.conv1 = nn.Conv2d(3, 6, kernel_size=5)
+        self.conv1 = nn.Conv2d(3, 6, kernel_size=5, bias=False)
         self.conv1_bn = nn.BatchNorm2d(6)
-        self.conv2 = nn.Conv2d(6, 16, kernel_size=5)
+        self.conv2 = nn.Conv2d(6, 16, kernel_size=5, bias=False)
         self.conv2_bn = nn.BatchNorm2d(16)
-        self.fc1 = nn.Linear(9216, 120)
+        self.fc1 = nn.Linear(9216, 120, bias=False)
         self.fc1_bn = nn.BatchNorm1d(120)
-        self.fc2 = nn.Linear(120, 84)
+        self.fc2 = nn.Linear(120, 84, bias=False)
         self.fc2_bn = nn.BatchNorm1d(84)
-        self.fc3 = nn.Linear(84, num_classes)
+        self.fc3 = nn.Linear(84, num_classes, bias=False)
 
         self.param_info = [{'layer_type': 'Conv2d', 'kernel_size':(5,5), 'stride':1, 'padding': 0, 'name':'Conv1'},
                             {'layer_type': 'Conv2d', 'kernel_size':(5,5), 'stride':1, 'padding':0, 'name':'Conv2'},

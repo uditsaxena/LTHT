@@ -20,9 +20,13 @@ from archs.cifar10.AlexNet import AlexNet as AlexNet_cifar10
 from archs.cifar10.AlexNet import AlexNet_nmp as AlexNet_nmp_cifar10
 
 from archs.mnist.LeNet5 import LeNet5 as LeNet5_mnist
+from archs.mnist.LeNet5 import LeNet5_bn as LeNet5_bn_mnist
 from archs.mnist.LeNet5 import LeNet5_nmp as LeNet5_nmp_mnist
+from archs.mnist.LeNet5 import LeNet5_nmp_bn as LeNet5_nmp_bn_mnist
 from archs.cifar10.LeNet5 import LeNet5 as LeNet5_cifar10
+from archs.cifar10.LeNet5 import LeNet5_bn as LeNet5_bn_cifar10
 from archs.cifar10.LeNet5 import LeNet5_nmp as LeNet5_nmp_cifar10
+from archs.cifar10.LeNet5 import LeNet5_nmp_bn as LeNet5_nmp_bn_cifar10
 
 from archs.mnist.resnet import resnet18 as resnet18_mnist
 from archs.mnist.resnet_nmp import resnet18 as resnet18_nmp_mnist
@@ -47,9 +51,13 @@ def get_model_param_info(model_name, dataset):
         "alexnet_nmp_cifar10": AlexNet_nmp_cifar10,
 
         "lenet5_mnist": LeNet5_mnist,
+        "lenet5_bn_mnist": LeNet5_bn_mnist,
         "lenet5_nmp_mnist": LeNet5_nmp_mnist,
+        "lenet5_nmp_bn_mnist": LeNet5_nmp_bn_mnist,
         "lenet5_cifar10": LeNet5_cifar10,
+        "lenet5_bn_cifar10": LeNet5_bn_cifar10,
         "lenet5_nmp_cifar10": LeNet5_nmp_cifar10,
+        "lenet5_nmp_bn_cifar10": LeNet5_nmp_bn_cifar10,
 
         "resnet18_mnist": resnet18_mnist,
         "resnet18_nmp_mnist": resnet18_nmp_mnist,
@@ -63,6 +71,12 @@ def get_model_param_info(model_name, dataset):
 
 
 def compute_homology(model, dataset, root_dir, restart_at=0):
+
+    init_model_location = root_dir + "initial_state_dict_lt.pth.tar"
+    print('Computing Homology of Initial Parameters')
+    computer_per_model_homology(model, dataset, root_dir, 'init',
+                                init_model_location)
+
     for listed_file in sorted(os.listdir(root_dir))[restart_at:]:
         if (listed_file[0].isdigit()):
             print("epoch: ", listed_file)
