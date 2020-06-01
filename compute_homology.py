@@ -98,6 +98,7 @@ def computer_per_model_homology(model_name, dataset, root_dir, epoch, model_loca
     # print(rips_pickle_dir)
     persim_image_dir = root_dir + "persim/"
     # print(persim_image_dir)
+    graphml_dir = root_dir + 'gpickle/'
 
     model = torch.load(model_location, map_location=torch.device('cpu'))
     if dataset == 'mnist':
@@ -110,7 +111,7 @@ def computer_per_model_homology(model_name, dataset, root_dir, epoch, model_loca
     architecture = model_name + "_" + dataset
     if (architecture not in model_graph_dict) or (epoch == 0):
         print(("Architecture: {} not found, creating").format(architecture))
-        NNG = nn_graph.NNGraph()
+        NNG = nn_graph.NNGraph(undirected=True)
         NNG.parameter_graph(model, param_info, input_dim, ignore_zeros=True, verbose=True)
         # model_graph_dict[architecture] = NNG
     else:
@@ -119,13 +120,19 @@ def computer_per_model_homology(model_name, dataset, root_dir, epoch, model_loca
         # NNG.update_adjacency(model)
 
     print('Computing Homology')
-    sps = nx.to_scipy_sparse_matrix(NNG.G)
+    sps = nx.to_scipy_sparse_matrix(NNG.G.to_undirected())
     mrs = sparse_min_row(sps)
     sps.setdiag(mrs)
     rips = ripser(sps, distance_matrix=True, maxdim=1, do_cocycles=True)
 
     # root_dir contains something in the format of:
     # /home/udit/programs/LTHT/remote_data/saves/alexnet_nmp/mnist/0/
+
+    # save graph as graphml file
+    if not (os.path.isdir(graphml_dir)):
+        os.mkdir(graphml_dir)
+    ml_file = graphml_dir + epoch + '.pickle.gz'
+    nx.write_gpickle(NNG.G, ml_file)
 
     if not (os.path.isdir(rips_pickle_dir)):
         os.mkdir(rips_pickle_dir)
